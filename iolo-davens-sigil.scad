@@ -1,7 +1,7 @@
 // Mage Sigil of Iolo Davens
 //
 
-$fn=20;
+$fn=180;
 
 module circle_cutter(s) {
   difference(){
@@ -15,8 +15,6 @@ module epaulet(s) {
     translate([-s*1.25, 0, 0])  
     circle(s);
     circle_cutter(s);
-    //translate([0, -s * .5, 0])
-    //circle_cutter(s);
     translate([0, s*.2, 0])
     circle(s*1.1);
   }
@@ -48,15 +46,11 @@ module i(s,d){
 }
 
 module d(s,d) {
-  //translate([0,s*.1,0]) // hmmm... 
-  //scale([0.9, 0.9, 1])
-  //color("#435579") 
   linear_extrude(s*d) {
     difference() {
       translate([0,s/2, 0]) difference() {
         circle(s*1.15);
           translate([0, +s*.95,,0]) circle(s*1.35);
-          //translate([0, -s*1.25,,0]) circle(s);
         }
         circle_cutter(s);
       
@@ -95,33 +89,38 @@ module sigil(s,d) {
     buttonholes(s);
     fillet(s);
   }  
-  
   // epaulets
   //epaulet(s);
   //rotate([0,180,0]) epaulet(s);
-
-
 }
-module roundover(s) {
-  intersection() {
-  difference() {
-    union() {
-      //d(s,.1);
-      //i(s,.15);
-      d(s,2);
-      i(s,2);
-    }
-    buttonholes(s);
-    //fillet(s);
-  }  
-    scale([1,1,.5]) difference() {
-      translate([0,0,-s]) sphere(s*1.9);
-      translate([0,0,-s-10]) sphere(s*2.1);
-    }
-    translate([0,0,3.5]) scale([1,1,.5]) sphere(s*1.05);
+
+module convexhull(s) {
+  scale([1,1,.3]) difference() {
+    translate([0,0,-s*1.5+3]) sphere(s*1.9);
+    // underside, requires support if present
+    translate([0,0,-s*1.5-11]) sphere(s*2.1); 
   }
-  //}
+}
+
+module convex(s) {
+  intersection() {
+    difference() {
+      union() {
+        intersection() {
+          i(s,2);
+          convexhull(s);
+        }
+        intersection() {
+          d(s,2);
+          translate([0,0,-1]) convexhull(s);
+        }
+      }
+      buttonholes(s);
+    }  
+    // fillet
+    translate([0,0,-s/2+13]) scale([1,1,.3]) sphere(s*1.05);
+  }
 }
 
 //translate([70,0,0]) sigil(30);
-roundover(30);
+convex(30);
