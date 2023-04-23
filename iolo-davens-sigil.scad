@@ -1,7 +1,7 @@
 // Mage Sigil of Iolo Davens
 //
 
-$fn=50;
+$fn=20;
 
 module circle_cutter(s) {
   difference(){
@@ -23,19 +23,20 @@ module epaulet(s) {
 }
 
 module pinhole(s){
-  cylinder(s,1.2);
+  translate([-2, 0, 0]) cylinder(s,1.0);
+  translate([2, 0, 0]) cylinder(s,1.0);
 }
 
-module pinholes(s) {
+module buttonholes(s) {
   translate([0,s*.83,0]) pinhole(s);
   translate([0,-s*.83,0]) pinhole(s);
-  rotate([0,0,5]) translate([s*.85, 0,0]) pinhole(s);
-  rotate([0,0,-5]) translate([-s*.85, 0,0]) pinhole(s);
+  rotate([0,0,85]) translate([0,s*.85,,0]) pinhole(s);
+  rotate([0,0,-85]) translate([0, s*.85,,0]) pinhole(s);
 }
 
 
-module i(s){
-  linear_extrude(s*0.15) {
+module i(s,d){
+  linear_extrude(s*d) {
     color("#1255AA")
     translate([0,0,.1])
     difference() {
@@ -46,11 +47,11 @@ module i(s){
   }
 }
 
-module d(s) {
+module d(s,d) {
   //translate([0,s*.1,0]) // hmmm... 
   //scale([0.9, 0.9, 1])
   //color("#435579") 
-  linear_extrude(s*0.1) {
+  linear_extrude(s*d) {
     difference() {
       translate([0,s/2, 0]) difference() {
         circle(s*1.15);
@@ -85,20 +86,42 @@ module fillet(s) {
   }
 }
 
-module sigil(s) {
+module sigil(s,d) {
   difference() {
     union() {
-      d(s);
-      i(s);
+      d(s,.1);
+      i(s,.15);
     }
-    pinholes(s);
+    buttonholes(s);
     fillet(s);
   }  
+  
   // epaulets
   //epaulet(s);
   //rotate([0,180,0]) epaulet(s);
 
 
 }
+module roundover(s) {
+  intersection() {
+  difference() {
+    union() {
+      //d(s,.1);
+      //i(s,.15);
+      d(s,2);
+      i(s,2);
+    }
+    buttonholes(s);
+    //fillet(s);
+  }  
+    scale([1,1,.5]) difference() {
+      translate([0,0,-s]) sphere(s*1.9);
+      translate([0,0,-s-10]) sphere(s*2.1);
+    }
+    translate([0,0,3.5]) scale([1,1,.5]) sphere(s*1.05);
+  }
+  //}
+}
 
-sigil(30);
+//translate([70,0,0]) sigil(30);
+roundover(30);
