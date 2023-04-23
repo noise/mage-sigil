@@ -1,4 +1,4 @@
-// Wizard Sigil of Iolo Davens
+// Mage Sigil of Iolo Davens
 //
 
 $fn=50;
@@ -22,8 +22,20 @@ module epaulet(s) {
   }
 }
 
+module pinhole(s){
+  cylinder(s,1.2);
+}
+
+module pinholes(s) {
+  translate([0,s*.83,0]) pinhole(s);
+  translate([0,-s*.83,0]) pinhole(s);
+  rotate([0,0,5]) translate([s*.85, 0,0]) pinhole(s);
+  rotate([0,0,-5]) translate([-s*.85, 0,0]) pinhole(s);
+}
+
+
 module i(s){
-  linear_extrude(.5) {
+  linear_extrude(s*0.15) {
     color("#1255AA")
     translate([0,0,.1])
     difference() {
@@ -38,7 +50,7 @@ module d(s) {
   //translate([0,s*.1,0]) // hmmm... 
   //scale([0.9, 0.9, 1])
   //color("#435579") 
-  linear_extrude(.4) {
+  linear_extrude(s*0.1) {
     difference() {
       translate([0,s/2, 0]) difference() {
         circle(s*1.15);
@@ -63,13 +75,30 @@ module d(s) {
   }
 }
 
+module fillet(s) {
+  rndrad=s*.2;
+
+  translate([0,0,s*.15])
+  rotate_extrude() {
+    translate([s+rndrad-s*.14,s*.12,0])
+        circle(rndrad);
+  }
+}
+
 module sigil(s) {
-  d(s);
-  i(s);
-  
+  difference() {
+    union() {
+      d(s);
+      i(s);
+    }
+    pinholes(s);
+    fillet(s);
+  }  
   // epaulets
   //epaulet(s);
   //rotate([0,180,0]) epaulet(s);
+
+
 }
 
-sigil(5);
+sigil(30);
